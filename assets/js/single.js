@@ -1,5 +1,20 @@
 var issueContainerEl = document.querySelector("#issues-container");
 var limitWarningEl = document.querySelector("#limit-warning");
+var repoNameEl = document.querySelector("#repo-name");
+
+var getRepoOwnerAndName = function() {
+    if (document.location.search) {
+        var queryString = document.location.search;
+        var splitQueryString = queryString.split("&");
+        var sliceOwnerString = splitQueryString[0].slice(1);
+        var repoOwner = sliceOwnerString.split("=")[1];
+        var repoName = splitQueryString[1].split("=")[1];
+        repoNameEl.textContent = repoName;
+        getRepoIssues(repoOwner, repoName);
+    } else {
+        document.location.replace("./index.html");
+    }
+}; 
 
 var getRepoIssues = function(owner,repo) {
     var apiUrl = "https://api.github.com/repos/"+owner+"/"+repo+"/issues?direction=asc";
@@ -17,10 +32,10 @@ var getRepoIssues = function(owner,repo) {
                 }
             });
         } else {
-            alert("There was a problem with your request!")
+            document.location.replace("./index.html");
         }
     });
-}
+};
 
 var displayIssues = function(issues) {
     if (issues.length === 0) {
@@ -49,10 +64,11 @@ var displayIssues = function(issues) {
             typeEl.textContent = "(Issue)"
         }
         // append to container
+        issueEl.appendChild(titleEl);
         issueEl.appendChild(typeEl);
         issueContainerEl.appendChild(issueEl);
     }
-}
+};
 
 var displayWarning = function(owner, repo) {
     // add text to warning container
@@ -65,6 +81,6 @@ var displayWarning = function(owner, repo) {
 
     // append to warning container
     limitWarningEl.appendChild(linkEl);
-}
+};
 
-getRepoIssues("octocat","git-consortium");
+getRepoOwnerAndName();
